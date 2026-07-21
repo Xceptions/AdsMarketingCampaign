@@ -1,5 +1,8 @@
 import os
+import sys
 from pathlib import Path
+import yaml
+import argparse
 import numpy as np
 import pandas as pd
 
@@ -20,7 +23,10 @@ class Preprocess:
         return df
 
     def preprocess(self, df: pd.DataFrame) -> None:
-        """Preprocessing the data using pandas or spark"""
+        """
+        Preprocessing the data using pandas or spark.
+        Cleaning, imputation
+        """
         # using first 20k as train and next 5k as test
         df_train = df[:20000]
         df_test = df[20000:25000]
@@ -42,10 +48,32 @@ class Preprocess:
 
         return True
 
-if __name__ == "__main__":
+def main(config_path: str):
+    with open(config_path, "r") as f:
+        config = yaml.safe_load(f)
+
+    data_path = config['base_data']
+    output_path = config['processed_dir']
+
     preprocess = Preprocess(
-        data_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/raw/ads_campaign_data.csv',
-        output_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/processed/'
+        data_path = data_path,
+        output_path = output_path
     )
     preprocess.run_step()
 
+
+if __name__ == "__main__":
+    # check if file is called using another yaml file
+    # python3 preprocess.py --config path_to_file <- absolute is better
+    parser = argparse.ArgumentParser(description='for calling script in cli')
+    parser.add_argument("-c", "--config", required=True, help="Path to the config file")
+    args = parser.parse_args()
+
+    # if path is relative, convert to absolute
+    config_path = Path(args.config).resolve()
+
+    if not config_path.exists():
+        raise ValueError(f"Error: Configuration file not found at {config_path}")
+    print(f'Successfully loaded configuration file at {config_path}')
+
+    main(config_path)
