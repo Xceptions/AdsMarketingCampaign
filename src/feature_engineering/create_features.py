@@ -6,7 +6,7 @@ import pandas as pd
 
 
 class CreateFeatures:
-    """ Feature Engineering based on Exploration """
+    """ Feature creation based on Exploration """
     
     def __init__(self, train_data_path:str, test_data_path:str, output_path:str) -> None:
         self.train_data_path = train_data_path
