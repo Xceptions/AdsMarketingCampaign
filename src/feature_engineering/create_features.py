@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 
-class FeatureEngineering:
+class CreateFeatures:
     """ Feature Engineering based on Exploration """
     
     def __init__(self, train_data_path:str, test_data_path:str, output_path:str) -> None:
@@ -51,7 +51,7 @@ class FeatureEngineering:
         return True
 
 if __name__ == "__main__":
-    create_features = FeatureEngineering(
+    create_features = CreateFeatures(
         train_data_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/processed/ads_campaign_data_train.csv',
         test_data_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/processed/ads_campaign_data_test.csv',
         output_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/feature_store/'
