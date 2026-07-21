@@ -12,7 +12,7 @@ class FeatureEngineering:
         self.train_data_path = train_data_path
         self.test_data_path = test_data_path
         self.output_path = output_path
-        
+
         # extract file name and extension for saving later
         self.train_file_path = Path(train_data_path)
         self.train_file_name = self.train_file_path.stem
@@ -45,16 +45,16 @@ class FeatureEngineering:
     def run_step(self) -> bool:
         self.df_train, self.df_test = self.read_data(self.train_data_path, self.test_data_path)
         self.df_train, self.df_test = self.create_features(self.df_train, self.df_test)
-        self.save_data(self.df_train, self.output_path, self.train_file_name, 'train_created', self.train_file_ext)
-        self.save_data(self.df_test, self.output_path, self.test_file_name, 'test_created', self.test_file_ext)
+        self.save_data(self.df_train, self.output_path, self.train_file_name, 'created', self.train_file_ext)
+        self.save_data(self.df_test, self.output_path, self.test_file_name, 'created', self.test_file_ext)
 
         return True
 
 if __name__ == "__main__":
-    engineer_features = FeatureEngineering(
+    create_features = FeatureEngineering(
         train_data_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/processed/ads_campaign_data_train.csv',
         test_data_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/processed/ads_campaign_data_test.csv',
         output_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/feature_store/'
     )
-    engineer_features.run_step()
+    create_features.run_step()
 
