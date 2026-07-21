@@ -3,9 +3,25 @@ import sys
 from pathlib import Path
 import yaml
 import argparse
+import logging
 import numpy as np
 import pandas as pd
 
+# logs should be saved to db not file
+# file used here is placeholder
+log_dir = Path("/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/logs")
+log_file = log_dir / "production.log"
+log_dir.mkdir(parents=True, exist_ok=True)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.FileHandler(log_file),
+        logging.StreamHandler()
+    ]
+)
 
 class Preprocess:
     """ Preprocessing based on Exploration """
@@ -72,8 +88,12 @@ if __name__ == "__main__":
     # if path is relative, convert to absolute
     config_path = Path(args.config).resolve()
 
+    logging.info(f"Resolving configuration path: {config_path}")
+
     if not config_path.exists():
+        logging.error(f"Configuration file missing: {config_path}")
         raise ValueError(f"Error: Configuration file not found at {config_path}")
-    print(f'Successfully loaded configuration file at {config_path}')
+
+    logging.info(f'Successfully loaded configuration file at {config_path}')
 
     main(config_path)
