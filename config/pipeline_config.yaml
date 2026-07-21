@@ -1,0 +1,11 @@
+# Global data directory settings
+storage:
+  base_dir: "data/raw"
+  preprocessed_dir: "data/processed"
+  feature_store_dir: "data/feature_store"
+  selected_dir: "data/selected"
+
+# Feature selection 
+feature_selection:
+  target_column: "Revenue"
+  selected_features: ["Clicks_Plus_Leads", "Clicks", "Leads"]
