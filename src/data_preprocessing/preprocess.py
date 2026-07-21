@@ -61,6 +61,7 @@ class Preprocess:
         self.df_train, self.df_test = self.preprocess(self.df)
         self.save_data(self.df_train, self.output_path, self.file_name, 'train', self.file_ext)
         self.save_data(self.df_test, self.output_path, self.file_name, 'test', self.file_ext)
+        logging.info(f'Process complete. Outputs saved to {self.output_path}')
 
         return True
 
@@ -68,8 +69,8 @@ def main(config_path: str):
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
-    data_path = config['base_data']
-    output_path = config['processed_dir']
+    data_path = config['storage']['base_data']
+    output_path = config['storage']['processed_dir']
 
     preprocess = Preprocess(
         data_path = data_path,
