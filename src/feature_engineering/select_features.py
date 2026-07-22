@@ -104,16 +104,3 @@ if __name__ == "__main__":
     logging.info(f'Successfully loaded configuration file at {config_path}')
 
     main(config_path)
-
-
-
-
-
-# if __name__ == "__main__":
-#     select_features = SelectFeatures(
-#         train_data_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/feature_store/ads_campaign_data_train_created.csv',
-#         test_data_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/feature_store/ads_campaign_data_test_created.csv',
-#         output_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/selected/'
-#     )
-#     select_features.run_step()
-
