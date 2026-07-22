@@ -1,9 +1,26 @@
 import os
+import sys
 from pathlib import Path
 from typing import Tuple
+import yaml
+import argparse
+import logging
 import numpy as np
 import pandas as pd
 
+log_dir = Path("/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/logs")
+log_file = log_dir / "production.log"
+log_dir.mkdir(parents=True, exist_ok=True)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.FileHandler(log_file),
+        logging.StreamHandler()
+    ]
+)
 
 class SelectFeatures:
     """ Feature selection based on Exploration """
@@ -52,11 +69,51 @@ class SelectFeatures:
 
         return True
 
-if __name__ == "__main__":
+
+def main(config_path: str):
+    with open(config_path, "r") as f:
+        config = yaml.safe_load(f)
+
+    train_data_path = config['storage']['feature_store_train_data']
+    test_data_path = config['storage']['feature_store_test_data']
+    output_path = config['storage']['selected_dir']
+
     select_features = SelectFeatures(
-        train_data_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/feature_store/ads_campaign_data_train_created.csv',
-        test_data_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/feature_store/ads_campaign_data_test_created.csv',
-        output_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/selected/'
+        train_data_path = train_data_path,
+        test_data_path = test_data_path,
+        output_path = output_path
     )
     select_features.run_step()
+    logging.info('select_features script successfully completed run...')
+
+
+if __name__ == "__main__":
+    logging.info('Executing: select_features script..')
+    parser = argparse.ArgumentParser(description='for calling script in cli')
+    parser.add_argument("-c", "--config", required=True, help="Path to the config file")
+    args = parser.parse_args()
+    
+    config_path = Path(args.config).resolve()
+
+    logging.info(f"Resolving configuration path: {config_path}")
+
+    if not config_path.exists():
+        logging.error(f"Configuration file missing: {config_path}")
+        raise ValueError(f"Error: Configuration file not found at {config_path}")
+
+    logging.info(f'Successfully loaded configuration file at {config_path}')
+
+    main(config_path)
+
+
+
+
+
+# if __name__ == "__main__":
+#     select_features = SelectFeatures(
+#         train_data_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/feature_store/ads_campaign_data_train_created.csv',
+#         test_data_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/feature_store/ads_campaign_data_test_created.csv',
+#         output_path = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/selected/'
+#     )
+#     select_features.run_step()
 

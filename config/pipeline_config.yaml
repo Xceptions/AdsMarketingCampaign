@@ -5,6 +5,8 @@ storage:
   processed_dir: "/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/processed/"
   processed_train_data: "/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/processed/ads_campaign_data_train.csv"
   processed_test_data: "/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/processed/ads_campaign_data_test.csv"
+  feature_store_train_data: "/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/feature_store/ads_campaign_data_train_created.csv"
+  feature_store_test_data: "/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/feature_store/ads_campaign_data_test_created.csv"
   feature_store_dir: "/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/feature_store/"
   selected_dir: "/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/selected/"
 
