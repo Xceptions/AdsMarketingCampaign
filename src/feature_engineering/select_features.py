@@ -26,6 +26,14 @@ class SelectFeatures:
     """ Feature selection based on Exploration """
     
     def __init__(self, train_data_path:str, test_data_path:str, output_path:str) -> None:
+        """
+        Args:
+            train_data_path (str): Path of the create_features train data
+            test_data_path (str): Path of the create_features test data
+            output_path (str): Where to save the new dataframe to
+        Returns:
+            None
+        """
         self.train_data_path = train_data_path
         self.test_data_path = test_data_path
         self.output_path = output_path
@@ -40,13 +48,28 @@ class SelectFeatures:
         self.test_file_ext = self.test_file_path.suffix
 
     def read_data(self, train_data_path:str, test_data_path:str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        """ Read data using pandas or spark """
+        """
+        Read data using pandas or spark
+
+        Args:
+            train_data_path (str): Path of the create_features train data
+            test_data_path (str): Path of the create_features test data
+        Returns:
+            Tuple[pd.DataFrame, pd.DataFrame]: the dataframes read from the path
+        """
         df_train = pd.read_csv(train_data_path)
         df_test = pd.read_csv(test_data_path)
         return df_train, df_test
 
     def select_features(self, df_train:pd.DataFrame, df_test:pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        """ Selecting features for training """
+        """ Selecting high quality features 
+        
+        Args:
+            df_train (pd.DataFrame): train data read from the path
+            df_test (pd.DataFrame): test data read from the path
+        Returns:
+            Tuple[pd.DataFrame, pd.DataFrame]: the dataframes with selected features
+        """
         features = ['Clicks_Plus_Leads', 'Clicks', 'Leads']
         target = ['Revenue']
         df_train = df_train[features + target]
@@ -59,9 +82,27 @@ class SelectFeatures:
                 name: str,
                 version: str,
                 ext: str) -> bool:
+        """
+        Args:
+            df (pd.DataFrame): the dataframe to save
+            output_path (str): the path to save the df
+            name (str): the name to use in saving the file
+            version (str): version of the file
+            ext (str): file extension
+        Returns:
+            (bool): whether the dataframe was saved or not
+        """
         return df.to_csv(f'{output_path}{name}_{version}{ext}', index=False)
         
     def run_step(self) -> bool:
+        """
+        Runs the class step in the expected order
+
+        Args:
+            None
+        Returns:
+            (bool): confirmation of success
+        """
         self.df_train, self.df_test = self.read_data(self.train_data_path, self.test_data_path)
         self.df_train, self.df_test = self.select_features(self.df_train, self.df_test)
         self.save_data(self.df_train, self.output_path, self.train_file_name, 'selected', self.train_file_ext)
@@ -71,6 +112,14 @@ class SelectFeatures:
 
 
 def main(config_path: str):
+    """
+    Calls the SelectFeatures class
+
+    Args:
+        config_path (str): path to the configuration file for the run
+    Returns:
+        (bool): confirmation of success
+    """
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 

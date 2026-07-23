@@ -67,8 +67,8 @@ class CreateFeatures:
         """ Creating high quality features 
         
         Args:
-            train_data_path (str): train data read from the path
-            test_data_path (str): test data read from the path
+            df_train (pd.DataFrame): train data read from the path
+            df_test (pd.DataFrame): test data read from the path
         Returns:
             Tuple[pd.DataFrame, pd.DataFrame]: the dataframes with created features
         """
