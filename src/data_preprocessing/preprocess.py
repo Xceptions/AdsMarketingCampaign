@@ -27,6 +27,13 @@ class Preprocess:
     """ Preprocessing based on Exploration """
     
     def __init__(self, data_path:str, output_path:str) -> None:
+        """
+        Args:
+            data_path (str): Path of the raw data
+            output_path (str): Where to save the preprocessed data to
+        Returns:
+            None
+        """
         self.data_path = data_path
         self.output_path = output_path
         self.file_path = Path(data_path)
@@ -34,14 +41,27 @@ class Preprocess:
         self.file_ext = self.file_path.suffix
 
     def read_data(self, data_path: str):
-        """Read data using pandas or spark"""
+        """
+        Read data using pandas or spark
+
+        Args:
+            data_path (str): Path of the raw data
+        Returns:
+            pd.DataFrame: the dataframe read from the path
+        """
         df = pd.read_csv(data_path)
         return df
 
     def preprocess(self, df: pd.DataFrame) -> None:
         """
         Preprocessing the data using pandas or spark.
-        Cleaning, imputation
+        Split into train-test, cleaning, imputation
+
+        Args:
+            df (pd.DataFrame): the dataframe read from the path
+        Returns:
+            Tuple[pd.DataFrame, pd.DataFrame]: a preprocessed split of
+                                               train and test data
         """
         # using first 20k as train and next 5k as test
         df_train = df[:20000]
@@ -54,9 +74,27 @@ class Preprocess:
                 name: str,
                 version: str,
                 ext: str) -> bool:
+        """
+        Args:
+            df (pd.DataFrame): the dataframe to save
+            output_path (str): the path to save the df
+            name (str): the name to use in saving the file
+            version (str): version of the file
+            ext (str): file extension
+        Returns:
+            (bool): whether the dataframe was saved or not
+        """
         return df.to_csv(f'{output_path}{name}_{version}{ext}', index=False)
         
     def run_step(self) -> bool:
+        """
+        Runs the preprocess step in the expected order
+
+        Args:
+            None
+        Returns:
+            (bool): confirmation of success
+        """
         self.df = self.read_data(self.data_path)
         self.df_train, self.df_test = self.preprocess(self.df)
         self.save_data(self.df_train, self.output_path, self.file_name, 'train', self.file_ext)
@@ -66,6 +104,14 @@ class Preprocess:
         return True
 
 def main(config_path: str):
+    """
+    Calls the Proprocess class
+
+    Args:
+        config_path (str): path to the configuration file for the run
+    Returns:
+        (bool): confirmation of success
+    """
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
