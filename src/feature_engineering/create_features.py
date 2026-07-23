@@ -25,9 +25,17 @@ logging.basicConfig(
 )
 
 class CreateFeatures:
-    """ Feature creation based on Exploration """
-    
+    """ Creating features based on Exploration """
+
     def __init__(self, train_data_path:str, test_data_path:str, output_path:str) -> None:
+        """
+        Args:
+            train_data_path (str): Path of the preprocessed train data
+            test_data_path (str): Path of the preprocessed test data
+            output_path (str): Where to save the new dataframe to
+        Returns:
+            None
+        """
         self.train_data_path = train_data_path
         self.test_data_path = test_data_path
         self.output_path = output_path
@@ -42,13 +50,28 @@ class CreateFeatures:
         self.test_file_ext = self.test_file_path.suffix
 
     def read_data(self, train_data_path:str, test_data_path:str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        """ Read data using pandas or spark """
+        """
+        Read data using pandas or spark
+
+        Args:
+            train_data_path (str): Path of the preprocessed train data
+            test_data_path (str): Path of the preprocessed test data
+        Returns:
+            Tuple[pd.DataFrame, pd.DataFrame]: the dataframes read from the path
+        """
         df_train = pd.read_csv(train_data_path)
         df_test = pd.read_csv(test_data_path)
         return df_train, df_test
 
     def create_features(self, df_train:pd.DataFrame, df_test:pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        """ Creating high quality features """
+        """ Creating high quality features 
+        
+        Args:
+            train_data_path (str): train data read from the path
+            test_data_path (str): test data read from the path
+        Returns:
+            Tuple[pd.DataFrame, pd.DataFrame]: the dataframes with created features
+        """
         df_train['Clicks_Plus_Leads'] = df_train['Clicks'] + df_train['Leads']
         df_test['Clicks_Plus_Leads'] = df_test['Clicks'] + df_test['Leads']
         return df_train, df_test
@@ -59,9 +82,27 @@ class CreateFeatures:
                 name: str,
                 version: str,
                 ext: str) -> bool:
+        """
+        Args:
+            df (pd.DataFrame): the dataframe to save
+            output_path (str): the path to save the df
+            name (str): the name to use in saving the file
+            version (str): version of the file
+            ext (str): file extension
+        Returns:
+            (bool): whether the dataframe was saved or not
+        """
         return df.to_csv(f'{output_path}{name}_{version}{ext}', index=False)
         
     def run_step(self) -> bool:
+        """
+        Runs the class step in the expected order
+
+        Args:
+            None
+        Returns:
+            (bool): confirmation of success
+        """
         self.df_train, self.df_test = self.read_data(self.train_data_path, self.test_data_path)
         self.df_train, self.df_test = self.create_features(self.df_train, self.df_test)
         self.save_data(self.df_train, self.output_path, self.train_file_name, 'created', self.train_file_ext)
@@ -71,6 +112,14 @@ class CreateFeatures:
 
 
 def main(config_path: str):
+    """
+    Calls the CreateFeatures class
+
+    Args:
+        config_path (str): path to the configuration file for the run
+    Returns:
+        (bool): confirmation of success
+    """
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
