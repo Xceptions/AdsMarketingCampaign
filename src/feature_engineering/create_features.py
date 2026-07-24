@@ -12,7 +12,7 @@ import pandas as pd
 class CreateFeatures:
     """ Creating features based on Exploration """
 
-    def __init__(self, train_data_path:str, test_data_path:str, output_path:str) -> None:
+    def __init__(self, train_data_path:str, test_data_path:str, output_path:str, logging:logging.Logger) -> None:
         """
         Args:
             train_data_path (str): Path of the preprocessed train data
@@ -24,6 +24,7 @@ class CreateFeatures:
         self.train_data_path = train_data_path
         self.test_data_path = test_data_path
         self.output_path = output_path
+        self.logging = logging
 
         # extract file name and extension for saving later
         self.train_file_path = Path(train_data_path)
@@ -81,6 +82,7 @@ class CreateFeatures:
         
     def run_step(self) -> bool:
         """
+        - Creates the create_feature output directory
         Runs the class step in the expected order
 
         Args:
@@ -88,10 +90,12 @@ class CreateFeatures:
         Returns:
             (bool): confirmation of success
         """
+        Path(self.output_path).mkdir(parents=True, exist_ok=True)
         self.df_train, self.df_test = self.read_data(self.train_data_path, self.test_data_path)
         self.df_train, self.df_test = self.create_features(self.df_train, self.df_test)
         self.save_data(self.df_train, self.output_path, self.train_file_name, 'created', self.train_file_ext)
         self.save_data(self.df_test, self.output_path, self.test_file_name, 'created', self.test_file_ext)
+        self.logging.info(f'Process complete')
 
         return True
 
@@ -129,13 +133,6 @@ def main(config_path: str):
     data_path = config['storage']['base_data']
     output_path = run_output + config['run_output']['processed_dir']
 
-    preprocess = Preprocess(
-        data_path = data_path,
-        output_path = output_path,
-        logging = logging
-    )
-    preprocess.run_step()
-
     train_data_path = run_output + config['run_output']['processed_train_data']
     test_data_path = run_output + config['run_output']['processed_test_data']
     output_path = run_output + config['run_output']['feature_store_dir']
@@ -143,27 +140,22 @@ def main(config_path: str):
     create_features = CreateFeatures(
         train_data_path = train_data_path,
         test_data_path = test_data_path,
-        output_path = output_path
+        output_path = output_path,
+        logging = logging
     )
     create_features.run_step()
     logging.info('create_features script successfully completed run...')
 
 
 if __name__ == "__main__":
-    logging.info('Executing: create_features script..')
     parser = argparse.ArgumentParser(description='for calling script in cli')
     parser.add_argument("-c", "--config", required=True, help="Path to the config file")
     args = parser.parse_args()
     
     config_path = Path(args.config).resolve()
 
-    logging.info(f"Resolving configuration path: {config_path}")
-
     if not config_path.exists():
-        logging.error(f"Configuration file missing: {config_path}")
         raise ValueError(f"Error: Configuration file not found at {config_path}")
-
-    logging.info(f'Successfully loaded configuration file at {config_path}')
 
     main(config_path)
 

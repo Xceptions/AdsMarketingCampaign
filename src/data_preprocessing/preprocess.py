@@ -74,7 +74,7 @@ class Preprocess:
         
     def run_step(self) -> bool:
         """
-        - Creates the output path
+        - Creates the preprocess output directory
         - Runs the preprocess step in the expected order
 
         Args:
@@ -87,7 +87,7 @@ class Preprocess:
         self.df_train, self.df_test = self.preprocess(self.df)
         self.save_data(self.df_train, self.output_path, self.file_name, 'train', self.file_ext)
         self.save_data(self.df_test, self.output_path, self.file_name, 'test', self.file_ext)
-        self.logging.info(f'Process complete. Outputs saved to {self.output_path}')
+        self.logging.info(f'Process complete')
 
         return True
 
