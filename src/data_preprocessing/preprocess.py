@@ -7,26 +7,11 @@ import logging
 import numpy as np
 import pandas as pd
 
-# logs should be saved to db not file
-# file used here is placeholder
-log_dir = Path("/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/logs")
-log_file = log_dir / "production.log"
-log_dir.mkdir(parents=True, exist_ok=True)
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    handlers=[
-        logging.FileHandler(log_file),
-        logging.StreamHandler()
-    ]
-)
 
 class Preprocess:
     """ Preprocessing based on Exploration """
     
-    def __init__(self, data_path:str, output_path:str) -> None:
+    def __init__(self, data_path:str, output_path:str, logging:logging.Logger) -> None:
         """
         Args:
             data_path (str): Path of the raw data
@@ -39,6 +24,7 @@ class Preprocess:
         self.file_path = Path(data_path)
         self.file_name = self.file_path.stem
         self.file_ext = self.file_path.suffix
+        self.logging = logging
 
     def read_data(self, data_path: str):
         """
@@ -88,18 +74,20 @@ class Preprocess:
         
     def run_step(self) -> bool:
         """
-        Runs the preprocess step in the expected order
+        - Creates the output path
+        - Runs the preprocess step in the expected order
 
         Args:
             None
         Returns:
             (bool): confirmation of success
         """
+        Path(self.output_path).mkdir(parents=True, exist_ok=True)
         self.df = self.read_data(self.data_path)
         self.df_train, self.df_test = self.preprocess(self.df)
         self.save_data(self.df_train, self.output_path, self.file_name, 'train', self.file_ext)
         self.save_data(self.df_test, self.output_path, self.file_name, 'test', self.file_ext)
-        logging.info(f'Process complete. Outputs saved to {self.output_path}')
+        self.logging.info(f'Process complete. Outputs saved to {self.output_path}')
 
         return True
 
@@ -115,32 +103,43 @@ def main(config_path: str):
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
+    run_output_top_level = config['run_output']['top_level']
+    run_output_name = config['name']
+    run_output = run_output_top_level + run_output_name
+
+    log_dir = Path(run_output + "/logs")
+    log_file = log_dir / "production.log"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=[
+            logging.FileHandler(log_file),
+            logging.StreamHandler()
+        ]
+    )
+    logging.info("Running preprocessing...")
+
     data_path = config['storage']['base_data']
-    output_path = config['storage']['processed_dir']
+    output_path = run_output + config['run_output']['processed_dir']
 
     preprocess = Preprocess(
         data_path = data_path,
-        output_path = output_path
+        output_path = output_path,
+        logging = logging
     )
     preprocess.run_step()
 
 
 if __name__ == "__main__":
-    # check if file is called using another yaml file
-    # python3 preprocess.py --config path_to_file <- absolute is better
     parser = argparse.ArgumentParser(description='for calling script in cli')
     parser.add_argument("-c", "--config", required=True, help="Path to the config file")
     args = parser.parse_args()
 
-    # if path is relative, convert to absolute
     config_path = Path(args.config).resolve()
 
-    logging.info(f"Resolving configuration path: {config_path}")
-
     if not config_path.exists():
-        logging.error(f"Configuration file missing: {config_path}")
         raise ValueError(f"Error: Configuration file not found at {config_path}")
-
-    logging.info(f'Successfully loaded configuration file at {config_path}')
 
     main(config_path)
