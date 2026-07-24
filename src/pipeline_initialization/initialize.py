@@ -65,12 +65,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='for calling script in cli')
     parser.add_argument("-c", "--config", required=True, help="Path to the config file")
     args = parser.parse_args()
-    print('got here')
-    print(args)
 
-    print(Path(args.config).resolve())
     config_path = Path(args.config).resolve()
-    print(config_path)
 
     if not config_path.exists():
         raise ValueError(f"Error: Configuration file not found at {config_path}")
