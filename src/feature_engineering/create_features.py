@@ -130,9 +130,6 @@ def main(config_path: str):
     )
     logging.info("Running create_features...")
 
-    data_path = config['storage']['base_data']
-    output_path = run_output + config['run_output']['processed_dir']
-
     train_data_path = run_output + config['run_output']['processed_train_data']
     test_data_path = run_output + config['run_output']['processed_test_data']
     output_path = run_output + config['run_output']['feature_store_dir']

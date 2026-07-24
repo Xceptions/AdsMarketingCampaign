@@ -8,24 +8,11 @@ import logging
 import numpy as np
 import pandas as pd
 
-log_dir = Path("/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/logs")
-log_file = log_dir / "production.log"
-log_dir.mkdir(parents=True, exist_ok=True)
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    handlers=[
-        logging.FileHandler(log_file),
-        logging.StreamHandler()
-    ]
-)
 
 class SelectFeatures:
     """ Feature selection based on Exploration """
     
-    def __init__(self, train_data_path:str, test_data_path:str, output_path:str) -> None:
+    def __init__(self, train_data_path:str, test_data_path:str, output_path:str, logging:logging.Logger) -> None:
         """
         Args:
             train_data_path (str): Path of the create_features train data
@@ -37,6 +24,7 @@ class SelectFeatures:
         self.train_data_path = train_data_path
         self.test_data_path = test_data_path
         self.output_path = output_path
+        self.logging = logging
         
         # extract file name and extension for saving later
         self.train_file_path = Path(train_data_path)
@@ -96,17 +84,20 @@ class SelectFeatures:
         
     def run_step(self) -> bool:
         """
-        Runs the class step in the expected order
+        - Creates the select_features output folder
+        - Runs the class step in the expected order
 
         Args:
             None
         Returns:
             (bool): confirmation of success
         """
+        Path(self.output_path).mkdir(parents=True, exist_ok=True)
         self.df_train, self.df_test = self.read_data(self.train_data_path, self.test_data_path)
         self.df_train, self.df_test = self.select_features(self.df_train, self.df_test)
         self.save_data(self.df_train, self.output_path, self.train_file_name, 'selected', self.train_file_ext)
         self.save_data(self.df_test, self.output_path, self.test_file_name, 'selected', self.test_file_ext)
+        self.logging.info('Process complete!')
 
         return True
 
@@ -123,33 +114,45 @@ def main(config_path: str):
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
-    train_data_path = config['storage']['feature_store_train_data']
-    test_data_path = config['storage']['feature_store_test_data']
-    output_path = config['storage']['selected_dir']
+    run_output_top_level = config['run_output']['top_level']
+    run_output_name = config['name']
+    run_output = run_output_top_level + run_output_name
+
+    log_dir = Path(run_output + "/logs")
+    log_file = log_dir / "production.log"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=[
+            logging.FileHandler(log_file),
+            logging.StreamHandler()
+        ]
+    )
+    logging.info("Running select_features...")
+
+    train_data_path = run_output + config['run_output']['feature_store_train_data']
+    test_data_path = run_output + config['run_output']['feature_store_test_data']
+    output_path = run_output + config['run_output']['selected_dir']
 
     select_features = SelectFeatures(
         train_data_path = train_data_path,
         test_data_path = test_data_path,
-        output_path = output_path
+        output_path = output_path,
+        logging = logging
     )
     select_features.run_step()
-    logging.info('select_features script successfully completed run...')
 
 
 if __name__ == "__main__":
-    logging.info('Executing: select_features script..')
     parser = argparse.ArgumentParser(description='for calling script in cli')
     parser.add_argument("-c", "--config", required=True, help="Path to the config file")
     args = parser.parse_args()
     
     config_path = Path(args.config).resolve()
 
-    logging.info(f"Resolving configuration path: {config_path}")
-
     if not config_path.exists():
-        logging.error(f"Configuration file missing: {config_path}")
         raise ValueError(f"Error: Configuration file not found at {config_path}")
-
-    logging.info(f'Successfully loaded configuration file at {config_path}')
 
     main(config_path)
