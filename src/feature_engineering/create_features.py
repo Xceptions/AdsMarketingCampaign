@@ -8,21 +8,6 @@ import logging
 import numpy as np
 import pandas as pd
 
-# logs should be saved to db not file
-# file used here is placeholder
-log_dir = Path("/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/logs")
-log_file = log_dir / "production.log"
-log_dir.mkdir(parents=True, exist_ok=True)
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    handlers=[
-        logging.FileHandler(log_file),
-        logging.StreamHandler()
-    ]
-)
 
 class CreateFeatures:
     """ Creating features based on Exploration """
@@ -123,9 +108,37 @@ def main(config_path: str):
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
-    train_data_path = config['storage']['processed_train_data']
-    test_data_path = config['storage']['processed_test_data']
-    output_path = config['storage']['feature_store_dir']
+    run_output_top_level = config['run_output']['top_level']
+    run_output_name = config['name']
+    run_output = run_output_top_level + run_output_name
+
+    log_dir = Path(run_output + "/logs")
+    log_file = log_dir / "production.log"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=[
+            logging.FileHandler(log_file),
+            logging.StreamHandler()
+        ]
+    )
+    logging.info("Running create_features...")
+
+    data_path = config['storage']['base_data']
+    output_path = run_output + config['run_output']['processed_dir']
+
+    preprocess = Preprocess(
+        data_path = data_path,
+        output_path = output_path,
+        logging = logging
+    )
+    preprocess.run_step()
+
+    train_data_path = run_output + config['run_output']['processed_train_data']
+    test_data_path = run_output + config['run_output']['processed_test_data']
+    output_path = run_output + config['run_output']['feature_store_dir']
 
     create_features = CreateFeatures(
         train_data_path = train_data_path,
