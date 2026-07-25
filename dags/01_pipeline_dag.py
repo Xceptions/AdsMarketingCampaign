@@ -12,7 +12,7 @@ if ROOT_DIR not in sys.path:
 from src.data_preprocessing import preprocess
 from src.feature_engineering import create_features, select_features
 
-CONFIG_FILE_PATH = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/config/pipeline_config.yaml'
+CONFIG_FILE_PATH = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/config/02_config.yaml'
 
 with DAG(
     dag_id="id_pipeline_dag",
