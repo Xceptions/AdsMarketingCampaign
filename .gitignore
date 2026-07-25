@@ -9,4 +9,3 @@ airflow.db-shm
 airflow.db-wal
 simple_auth_manager_passwords.json.generated
 ads_marketing_campaign.egg-info/
-src/modelling/training/train_decision_tree.py
