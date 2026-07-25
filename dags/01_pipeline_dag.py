@@ -3,16 +3,11 @@ import sys
 from pathlib import Path
 from datetime import datetime
 from airflow.sdk import DAG, task
-
-
-ROOT_DIR = str(Path(__file__).resolve().parents[1])
-if ROOT_DIR not in sys.path:
-    sys.path.insert(0, ROOT_DIR)
-
+from src.pipeline_initialization import initialize
 from src.data_preprocessing import preprocess
 from src.feature_engineering import create_features, select_features
 
-CONFIG_FILE_PATH = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/config/02_config.yaml'
+CONFIG_FILE_PATH = '/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/config/01_config.yaml'
 
 with DAG(
     dag_id="id_pipeline_dag",
@@ -21,6 +16,12 @@ with DAG(
     catchup=False,
     tags=["machine_learning"],
 ) as dag:
+
+    @task
+    def initialize_task(config_file: str):
+        """Executes data preprocessing script using the pipeline configuration"""
+        initialize.main(config_path=config_file)
+        return config_file
 
     @task
     def preprocess_data_task(config_file: str):
@@ -41,6 +42,7 @@ with DAG(
         return config_file
 
 
-    config_pointer = preprocess_data_task(CONFIG_FILE_PATH)
+    config_pointer = initialize_task(CONFIG_FILE_PATH)
+    config_pointer = preprocess_data_task(config_pointer)
     config_pointer = create_features_task(config_pointer)
     config_pointer = select_features_task(config_pointer)
