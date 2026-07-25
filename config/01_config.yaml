@@ -20,6 +20,10 @@ run_output:
   feature_store_test_data: "/data/feature_store/ads_campaign_data_test_created.csv"
 
   selected_dir: "/data/selected/"
+  selected_dir_train_data: "/data/selected/ads_campaign_data_train_created_selected.csv"
+  selected_dir_test_data: "/data/selected/ads_campaign_data_test_created_selected.csv"
+  
+  model_dir: "/model/"
 
 # selected features
 feature_selection:
