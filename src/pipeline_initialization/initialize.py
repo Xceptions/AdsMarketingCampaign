@@ -3,6 +3,7 @@ from pathlib import Path
 import logging
 import argparse
 import yaml
+from src.utils.logger import get_pipeline_logger
 
 
 class InitializePipeline:
@@ -42,21 +43,13 @@ def main(config_path: str):
     log_dir = Path(run_output + "/logs")
     log_file = log_dir / "production.log"
     log_dir.mkdir(parents=True, exist_ok=True)
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        handlers=[
-            logging.FileHandler(log_file),
-            logging.StreamHandler()
-        ]
-    )
-    logging.info("Configuration file loaded successfully...")
-    logging.info("Now calling initialization...")
+    logger = get_pipeline_logger(log_file_path=log_file)
+    logger.info("Configuration file loaded successfully...")
+    logger.info("Now calling initialization...")
 
     initialize = InitializePipeline(
         run_output = run_output,
-        logging = logging
+        logging = logger
     )
     initialize.run_step()
 
