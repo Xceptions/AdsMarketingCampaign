@@ -1,7 +1,7 @@
 # Run settings
 
 # name of run will be used as top-level output folder name
-name: "testrun_01"
+name: "testrun_02"
 
 # existing data to use
 storage:
