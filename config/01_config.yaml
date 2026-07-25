@@ -1,0 +1,27 @@
+# Run settings
+
+# name of run will be used as top-level output folder name
+name: "testrun_01"
+
+# existing data to use
+storage:
+  base_dir: "/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/raw/"
+  base_data: "/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/data/raw/ads_campaign_data.csv"
+
+run_output:
+  top_level: "/Users/macbookair/Documents/GitHub/AdsMarketingCampaign/output/"
+
+  processed_dir: "/data/processed/"
+  processed_train_data: "/data/processed/ads_campaign_data_train.csv"
+  processed_test_data: "/data/processed/ads_campaign_data_test.csv"
+
+  feature_store_dir: "/data/feature_store/"
+  feature_store_train_data: "/data/feature_store/ads_campaign_data_train_created.csv"
+  feature_store_test_data: "/data/feature_store/ads_campaign_data_test_created.csv"
+
+  selected_dir: "/data/selected/"
+
+# selected features
+feature_selection:
+  target_column: "Revenue"
+  selected_features: ["Clicks_Plus_Leads", "Clicks", "Leads"]
