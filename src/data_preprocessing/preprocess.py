@@ -6,6 +6,7 @@ import argparse
 import logging
 import numpy as np
 import pandas as pd
+from src.utils.logger import get_pipeline_logger
 
 
 class Preprocess:
@@ -110,16 +111,8 @@ def main(config_path: str):
     log_dir = Path(run_output + "/logs")
     log_file = log_dir / "production.log"
     log_dir.mkdir(parents=True, exist_ok=True)
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        handlers=[
-            logging.FileHandler(log_file),
-            logging.StreamHandler()
-        ]
-    )
-    logging.info("Running preprocessing...")
+    logger = get_pipeline_logger(log_file_path=log_file)
+    logger.info("Running preprocessing...")
 
     data_path = config['storage']['base_data']
     output_path = run_output + config['run_output']['processed_dir']
@@ -127,7 +120,7 @@ def main(config_path: str):
     preprocess = Preprocess(
         data_path = data_path,
         output_path = output_path,
-        logging = logging
+        logging = logger
     )
     preprocess.run_step()
 
