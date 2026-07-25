@@ -23,5 +23,5 @@ run_output:
 
 # selected features
 feature_selection:
-  target_column: "Revenue"
-  selected_features: ["Clicks_Plus_Leads", "Clicks", "Leads"]
+  target_column: ["Revenue"]
+  selected_features: ["Duration", "Clicks_Plus_Leads", "Clicks", "Leads"]

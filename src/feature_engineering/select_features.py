@@ -1,7 +1,7 @@
 import os
 import sys
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, List
 import yaml
 import argparse
 import logging
@@ -13,7 +13,14 @@ from src.utils.logger import get_pipeline_logger
 class SelectFeatures:
     """ Feature selection based on Exploration """
     
-    def __init__(self, train_data_path:str, test_data_path:str, output_path:str, logging:logging.Logger) -> None:
+    def __init__(
+                self,
+                train_data_path:str,
+                test_data_path:str,
+                output_path:str,
+                selected_features:List,
+                target_column:str,
+                logging:logging.Logger) -> None:
         """
         Args:
             train_data_path (str): Path of the create_features train data
@@ -25,6 +32,8 @@ class SelectFeatures:
         self.train_data_path = train_data_path
         self.test_data_path = test_data_path
         self.output_path = output_path
+        self.selected_features = selected_features
+        self.target_column = target_column
         self.logging = logging
         
         # extract file name and extension for saving later
@@ -59,8 +68,8 @@ class SelectFeatures:
         Returns:
             Tuple[pd.DataFrame, pd.DataFrame]: the dataframes with selected features
         """
-        features = ['Clicks_Plus_Leads', 'Clicks', 'Leads']
-        target = ['Revenue']
+        features = self.selected_features
+        target = self.target_column
         df_train = df_train[features + target]
         df_test = df_test[features + target]
         return df_train, df_test
@@ -128,11 +137,15 @@ def main(config_path: str):
     train_data_path = run_output + config['run_output']['feature_store_train_data']
     test_data_path = run_output + config['run_output']['feature_store_test_data']
     output_path = run_output + config['run_output']['selected_dir']
+    selected_features = config['feature_selection']['selected_features']
+    target_column = config['feature_selection']['target_column']
 
     select_features = SelectFeatures(
         train_data_path = train_data_path,
         test_data_path = test_data_path,
         output_path = output_path,
+        selected_features = selected_features,
+        target_column = target_column,
         logging = logger
     )
     select_features.run_step()
